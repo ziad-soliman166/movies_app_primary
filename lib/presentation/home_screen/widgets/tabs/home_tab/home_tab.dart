@@ -55,13 +55,11 @@ class _HomeTabState extends State<HomeTab> {
                           final movie = popularMovies![index];
                           return InkWell(
                             onTap: () {
-                              // Navigate to the MovieDetailsScreen with the movie ID
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => MovieDetailsScreen(
-                                    movieId:
-                                        movie.id as int, // Casting id to int
+                                    movieId: movie.id as int,
                                   ),
                                 ),
                               );
@@ -74,13 +72,12 @@ class _HomeTabState extends State<HomeTab> {
                                   width: double.infinity,
                                 ),
                                 Positioned(
-                                  bottom: MediaQuery.of(context).size.height *
-                                      0.1, // Adjust to center vertically
-                                  left: MediaQuery.of(context).size.width *
-                                      0.41, // Adjust to center horizontally
+                                  bottom:
+                                      MediaQuery.of(context).size.height * 0.1,
+                                  left:
+                                      MediaQuery.of(context).size.width * 0.41,
                                   child: ElevatedButton(
                                     onPressed: () {
-                                      // Navigate to the movie details or perform an action
                                       print("Play ${movie.title}");
                                     },
                                     child: Icon(
@@ -129,13 +126,11 @@ class _HomeTabState extends State<HomeTab> {
                             padding: const EdgeInsets.all(8.0),
                             child: InkWell(
                               onTap: () {
-                                // Navigate to the MovieDetailsScreen with the movie ID
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => MovieDetailsScreen(
-                                      movieId:
-                                          movie.id as int, // Casting id to int
+                                      movieId: movie.id as int,
                                     ),
                                   ),
                                 );
@@ -162,7 +157,6 @@ class _HomeTabState extends State<HomeTab> {
                     : Center(child: CircularProgressIndicator()),
               ),
 
-              // Top Rated Movies Section
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
@@ -185,13 +179,11 @@ class _HomeTabState extends State<HomeTab> {
                             padding: const EdgeInsets.all(8.0),
                             child: InkWell(
                               onTap: () {
-                                // Navigate to the MovieDetailsScreen with the movie ID
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => MovieDetailsScreen(
-                                      movieId:
-                                          movie.id as int, // Casting id to int
+                                      movieId: movie.id as int,
                                     ),
                                   ),
                                 );
