@@ -9,8 +9,7 @@ import '../sources/topRated/TopRated_source.dart';
 import '../sources/upcoming/Upcoming_source.dart';
 
 class Video {
-  final String
-      key; // The key used to fetch the video from YouTube or other platforms
+  final String key;
 
   Video({required this.key});
 
@@ -75,7 +74,6 @@ class ApiManager {
     return null;
   }
 
-  // Fetch related movies by movie ID
   Future<List<relatedMovie>?> fetchRelatedMovies(int movieId) async {
     final url = Uri.parse('$baseUrl/movie/$movieId/similar?api_key=$apiKey');
     try {
@@ -92,7 +90,6 @@ class ApiManager {
     return null;
   }
 
-  // Fetch video URL for a movie
   Future<String?> fetchMovieVideoUrl(int movieId) async {
     final url = Uri.parse('$baseUrl/movie/$movieId/videos?api_key=$apiKey');
     try {
@@ -100,9 +97,8 @@ class ApiManager {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['results'] != null && data['results'].isNotEmpty) {
-          // Assuming the first video result is the one to play
           String videoKey = data['results'][0]['key'];
-          return 'https://www.youtube.com/watch?v=$videoKey'; // URL for YouTube
+          return 'https://www.youtube.com/watch?v=$videoKey';
         }
       }
     } catch (e) {
@@ -111,7 +107,6 @@ class ApiManager {
     return null;
   }
 
-  // Add this method to ApiManager class
   Future<List<MovieDiscoverResults>?> fetchMoviesBySearch(String query) async {
     final url = Uri.parse('$baseUrl/search/movie?api_key=$apiKey&query=$query');
     try {

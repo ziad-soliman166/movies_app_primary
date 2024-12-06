@@ -23,7 +23,6 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     fetchRelatedMovies();
   }
 
-  // Fetch movie details
   void fetchMovieDetails() async {
     final movie = await apiManager.fetchMovieDetails(widget.movieId);
     setState(() {
@@ -31,7 +30,6 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     });
   }
 
-  // Fetch related movies
   void fetchRelatedMovies() async {
     final related = await apiManager.fetchRelatedMovies(widget.movieId);
     setState(() {
@@ -53,7 +51,6 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Movie Image and Description
                   Stack(
                     children: [
                       Image.network(
@@ -62,18 +59,14 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                         fit: BoxFit.cover,
                         height: MediaQuery.of(context).size.height * 0.4,
                       ),
-                      // Play button in the center of the image
                       Positioned(
-                        top: MediaQuery.of(context).size.height *
-                            0.15, // Vertically center
-                        left: MediaQuery.of(context).size.width *
-                            0.37, // Horizontally center
+                        top: MediaQuery.of(context).size.height * 0.15,
+                        left: MediaQuery.of(context).size.width * 0.37,
                         child: ElevatedButton(
-                          onPressed:
-                              () {}, // Trigger video fetching and navigation
+                          onPressed: () {},
                           child: Icon(
                             Icons.play_arrow,
-                            size: 50, // Increased size for better visibility
+                            size: 50,
                             color: Colors.black,
                           ),
                           style: ElevatedButton.styleFrom(
@@ -89,32 +82,32 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       movieDetails['title'] ?? "No Title",
-                      style: TextStyle(color: Colors.white, fontSize: 24),
+                      style: const TextStyle(color: Colors.white, fontSize: 24),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: Text(
                       movieDetails['overview'] ?? "No description available.",
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       "Rating: ${movieDetails['vote_average']}",
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       "Release Date: ${movieDetails['release_date']}",
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
-                  Padding(
+                  const Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       "More Like This",
@@ -126,7 +119,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                     ),
                   ),
                   relatedMovies == null
-                      ? Center(child: CircularProgressIndicator())
+                      ? const Center(child: CircularProgressIndicator())
                       : Container(
                           height: 150,
                           child: ListView.builder(
@@ -136,7 +129,6 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                               final movie = relatedMovies![index];
                               return InkWell(
                                 onTap: () {
-                                  // Navigate to the details of a related movie
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
@@ -158,7 +150,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                                         SizedBox(height: 5),
                                         Text(
                                           movie.title,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontSize: 12,
                                               color: Colors.white),
                                         ),

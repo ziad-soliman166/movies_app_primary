@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../api/api_manager/api_manager.dart';
 import '../../../../../api/sources/movie_Discover/MovieDiscover_Results.dart';
+import '../home_tab/widgets/movieDetails_screen.dart';
 
 class SearchTab extends StatefulWidget {
   const SearchTab({Key? key}) : super(key: key);
@@ -12,14 +13,50 @@ class SearchTab extends StatefulWidget {
 
 class _SearchTabState extends State<SearchTab> {
   TextEditingController searchController = TextEditingController();
-  List<MovieDiscoverResults>? searchResults;
+  List<MovieDiscoverResults>? searchResults = [];
   bool isLoading = false;
+
+  Duration debounceDuration = const Duration(milliseconds: 500);
+  late final VoidCallback _debounce;
+
+  @override
+  void initState() {
+    super.initState();
+    _debounce = () {
+      if (searchController.text.isNotEmpty) {
+        searchMovies(searchController.text);
+      } else {
+        setState(() {
+          searchResults = [];
+        });
+      }
+    };
+    searchController.addListener(_debouncedSearch);
+  }
+
+  @override
+  void dispose() {
+    searchController.removeListener(_debouncedSearch);
+    searchController.dispose();
+    super.dispose();
+  }
+
+  void _debouncedSearch() {
+    if (searchController.text.isEmpty) return;
+    Future.delayed(debounceDuration, _debounce);
+  }
 
   void searchMovies(String query) async {
     setState(() {
       isLoading = true;
     });
-    searchResults = await ApiManager().fetchMoviesBySearch(query);
+
+    try {
+      searchResults = await ApiManager().fetchMoviesBySearch(query);
+    } catch (error) {
+      searchResults = [];
+    }
+
     setState(() {
       isLoading = false;
     });
@@ -35,15 +72,10 @@ class _SearchTabState extends State<SearchTab> {
           controller: searchController,
           style: const TextStyle(color: Colors.white),
           decoration: const InputDecoration(
-            hintText: "Search...",
+            hintText: "Search movies...",
             hintStyle: TextStyle(color: Colors.grey),
             border: InputBorder.none,
           ),
-          onSubmitted: (query) {
-            if (query.isNotEmpty) {
-              searchMovies(query);
-            }
-          },
         ),
       ),
       body: isLoading
@@ -81,6 +113,17 @@ class _SearchTabState extends State<SearchTab> {
                         movie.releaseDate ?? "No release date",
                         style: const TextStyle(color: Colors.grey),
                       ),
+                      onTap: () {
+                        // Navigate to the MovieDetailsScreen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MovieDetailsScreen(
+                              movieId: movie.id!.toInt(),
+                            ),
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
