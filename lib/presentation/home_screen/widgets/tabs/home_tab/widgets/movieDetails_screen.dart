@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:movies/presentation/home_screen/widgets/tabs/home_tab/widgets/related_movie.dart';
 
@@ -16,25 +17,66 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   dynamic movieDetails;
   List<relatedMovie>? relatedMovies;
 
+  final Map<int, bool> _iconToggled = {};
+
+  final CollectionReference watchlistRef =
+      FirebaseFirestore.instance.collection('watchlist');
+
   @override
   void initState() {
     super.initState();
     fetchMovieDetails();
     fetchRelatedMovies();
+    loadWatchlistFromFirebase();
   }
 
-  void fetchMovieDetails() async {
+  Future<void> fetchMovieDetails() async {
     final movie = await apiManager.fetchMovieDetails(widget.movieId);
     setState(() {
       movieDetails = movie;
     });
   }
 
-  void fetchRelatedMovies() async {
+  Future<void> fetchRelatedMovies() async {
     final related = await apiManager.fetchRelatedMovies(widget.movieId);
     setState(() {
       relatedMovies = related;
     });
+  }
+
+  Future<void> loadWatchlistFromFirebase() async {
+    QuerySnapshot snapshot = await watchlistRef.get();
+    final List<dynamic> watchlist =
+        snapshot.docs.map((doc) => doc.data()).toList();
+
+    setState(() {
+      _iconToggled.clear();
+      for (var movie in watchlist) {
+        _iconToggled[movie['id']] = true;
+      }
+    });
+  }
+
+  Future<void> toggleWatchlist(relatedMovie movie) async {
+    final int movieId = movie.id;
+
+    setState(() {
+      _iconToggled[movieId] = !(_iconToggled[movieId] ?? false);
+    });
+
+    if (_iconToggled[movieId] == true) {
+      await watchlistRef.doc(movieId.toString()).set({
+        'id': movie.id,
+        'title': movie.title,
+        'posterPath': movie.posterPath,
+        'releaseDate': movie.releaseDate ?? '',
+        'overview': movie.overview ?? '',
+      });
+    } else {
+      await watchlistRef.doc(movieId.toString()).delete();
+    }
+
+    loadWatchlistFromFirebase();
   }
 
   @override
@@ -99,7 +141,6 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                       style: const TextStyle(color: Colors.white),
                     ),
                   ),
-                  const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
@@ -108,7 +149,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                     ),
                   ),
                   const Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(8.0),
                     child: Text(
                       "More Like This",
                       style: TextStyle(
@@ -121,41 +162,69 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                   relatedMovies == null
                       ? const Center(child: CircularProgressIndicator())
                       : Container(
-                          height: 150,
+                          height: 200,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
                             itemCount: relatedMovies!.length,
                             itemBuilder: (context, index) {
                               final movie = relatedMovies![index];
-                              return InkWell(
-                                onTap: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => MovieDetailsScreen(
-                                        movieId: movie.id,
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            MovieDetailsScreen(
+                                          movieId: movie.id,
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      children: [
-                                        Image.network(
-                                          'https://image.tmdb.org/t/p/w200${movie.posterPath}',
-                                          width: 100,
-                                        ),
-                                        SizedBox(height: 5),
-                                        Text(
-                                          movie.title,
-                                          style: const TextStyle(
+                                    );
+                                  },
+                                  child: Stack(
+                                    children: [
+                                      Column(
+                                        children: [
+                                          Image.network(
+                                            'https://image.tmdb.org/t/p/w200${movie.posterPath}',
+                                            width: 100,
+                                          ),
+                                          SizedBox(height: 5),
+                                          Text(
+                                            movie.title,
+                                            style: const TextStyle(
                                               fontSize: 12,
-                                              color: Colors.white),
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Positioned(
+                                        top: 4,
+                                        left: 4,
+                                        child: GestureDetector(
+                                          onTap: () => toggleWatchlist(movie),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  _iconToggled[movie.id] == true
+                                                      ? Colors.yellow
+                                                      : Colors.grey,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            padding: EdgeInsets.all(6),
+                                            child: Icon(
+                                              _iconToggled[movie.id] == true
+                                                  ? Icons.check
+                                                  : Icons.add,
+                                              color: Colors.white,
+                                              size: 16,
+                                            ),
+                                          ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               );
