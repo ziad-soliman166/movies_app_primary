@@ -15,7 +15,21 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
-  List<Widget> tabs = [HomeTab(), SearchTab(), BrowseTab(), WatchlistTab()];
+
+  List<dynamic> watchlistMovies = [];
+
+  late List<Widget> tabs;
+
+  @override
+  void initState() {
+    super.initState();
+    tabs = [
+      HomeTab(watchlistMovies: watchlistMovies),
+      SearchTab(),
+      BrowseTab(),
+      WatchlistTab(watchlistMovies: watchlistMovies),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +40,9 @@ class _HomeScreenState extends State<HomeScreen> {
         iconSize: 30,
         currentIndex: selectedIndex,
         onTap: (index) {
-          selectedIndex = index;
-          setState(() {});
+          setState(() {
+            selectedIndex = index;
+          });
         },
         items: const [
           BottomNavigationBarItem(
